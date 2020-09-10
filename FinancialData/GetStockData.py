@@ -18,7 +18,7 @@ def DownloadStockHistoricData(ticker):
         data = yf.Ticker(ticker)
         #print(stock.info) #Caution: Causes error on some tickers: https://github.com/ranaroussi/yfinance/issues/208
 
-        df = data.history(period="1mo")['Close']   #Download data. Only store the 'Close price' column
+        df = data.history(period="max")['Close']   #Download data. Only store the 'Close price' column
         #print(df)
 
         if (len(df)==0): return     #Ignore empty dataframe (possibly delisted company) 

@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, date
+from datetime import timedelta
 import os
 
 
@@ -11,7 +11,12 @@ class DataReader:
         self.cur = self.conn.cursor()
 
 
-    def GetPrice(self, ticker, datetime):
-        self.cur.execute("SELECT Close FROM '%s' WHERE Date = '%s'" % (ticker, datetime))
-        price = self.cur.fetchall()
-        return(price)
+    def GetPrice(self, ticker, _datetime):
+        found = False
+        while (not found):
+            self.cur.execute("SELECT Close FROM '%s' WHERE Date = '%s'" % (ticker, _datetime))
+            price = self.cur.fetchall()
+            if (len(price)): found = True
+            else: _datetime = _datetime - timedelta(days=1)
+
+        return(price[0][0]) #We just retrieved a number but it's inside a list of tuples, so we must present it as a single float   
