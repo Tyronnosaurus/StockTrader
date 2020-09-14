@@ -1,4 +1,5 @@
-from Broker import Broker
+from Broker.Broker import Broker
+from Broker.Order import buySell, limitTypes
 from datetime import date
 from Helpers import daterange, datetime
 import matplotlib.pyplot as plt
@@ -22,17 +23,20 @@ class Simulator:
 
             ## STRATEGY ##
             #If funds > $5000
+            #if (self.broker.Funds >= 5000):
                 #Get list of indexes
+                
                 #Find an index with a local min. Return if not found
                 #Get list of stocks in that index
                 #Find a stock in local min, 1Y-5Y low-ish
                 #Buy $5000 of it instantaneously
                 #Place Sell Order for 102% of buy price
 
-                #Command trader to execute any buy&sell orders
+            #Command trader to execute any buy&sell orders
 
-            if (t.day == 10): self.broker.BuyInstantly('ADS.DE', 5)
+            if (t.day == 10): self.broker.PlaceOrder(buySell.BUY, limitTypes.MARKET, 'ADS.DE', 5, 0)
 
+            self.broker.ExecuteOrders()
             self.dailyAccountValue.append(self.broker.GetAccountValue())
 
         self.ShowResults()
