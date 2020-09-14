@@ -6,9 +6,9 @@ from SqlHelpers import ListToSqlColumn
 
 
 #Indexes to include. Yahoo Finances uses non-standard names for the indexes, and also appends an ^ preffix
-Indexes = ['^GDAXI',    #DAX
-           '^MDAXI',    #MDAX
-           '^IBEX']     #IBEX 35
+Indexes = ['GDAXI',    #DAX
+           'MDAXI',    #MDAX
+           'IBEX']     #IBEX 35
 
 
 #Given an index of companies, downloads to a database the share price history of the index and each individual company
@@ -20,7 +20,7 @@ def DownloadIndexHistoricData(index):
     ListToSqlColumn(cur, '"' + index + '_Stocks"', ListOfTickers)
 
     #Step 2: Create a price history of the index -> Table INDEXNAME
-    DownloadPriceHistory(index)
+    DownloadPriceHistory('^' + index)
 
     #Step 3: Create a price history of every stock  -> Tables STOCK1, STOCK2...
     for ticker in ListOfTickers:
@@ -32,11 +32,11 @@ def DownloadIndexHistoricData(index):
 def DownloadPriceHistory(ticker):
         data = yf.Ticker(ticker)
 
-        df = data.history(period="1max")['Close']   #Download data. Only store the 'Close price' column
+        df = data.history(period="max")['Close']   #Download data. Only store the 'Close price' column
 
         if (len(df)==0): return()     #Ignore empty dataframe (possibly delisted company) 
         
-        df.to_sql(ticker, conn, if_exists='replace', index=True)
+        df.to_sql(ticker.replace('^',''), conn, if_exists='replace', index=True)
 
 
 

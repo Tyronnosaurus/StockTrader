@@ -16,7 +16,7 @@ yahooConversion = {
 def GetTickersListFromIndex(index):
 
     #Store each html table from the page in a list of dataframes
-    url = GetIndexUrl(index)
+    url = GetIndexUrl('^' + index)
     tables = pd.read_html(url)
     
     #The html page may have many tables. We only want the one containing the ticker symbols
