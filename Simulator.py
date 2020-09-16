@@ -3,7 +3,7 @@ from Broker.Order import buySell, limitTypes
 from datetime import date
 from Helpers import daterange, datetime
 import matplotlib.pyplot as plt
-
+from FinancialData.DataReader import DataReader
 
 
 class Simulator:
@@ -11,7 +11,8 @@ class Simulator:
     def __init__(self, Start_date, End_date):
         self.start_date = Start_date
         self.end_date   = End_date
-        self.broker = Broker()       #Stores our funds and portfolio, executes buy&sell orders
+        self.broker = Broker()       #Stores our funds and portfolio, executes buy&sell orders   
+        self.dataReader = DataReader() #Connects to SQL and fetches information
 
 
     def RunSimulation(self):
@@ -21,13 +22,19 @@ class Simulator:
         for t in daterange(self.start_date, self.end_date):
             self.broker.SetDateTime(t)    #Change broker's internal time so that it looks at past price data
 
+
+
             ## STRATEGY ##
             #If funds > $5000
-            #if (self.broker.Funds >= 5000):
+            if (self.broker.Funds >= 5000):
+                pass
                 #Get list of indexes
-                
                 #Find an index with a local min. Return if not found
+                index = 'GDAXI'
+
                 #Get list of stocks in that index
+                usableStocks = self.dataReader.GetStocksInIndex(index)
+
                 #Find a stock in local min, 1Y-5Y low-ish
                 #Buy $5000 of it instantaneously
                 #Place Sell Order for 102% of buy price
@@ -40,6 +47,8 @@ class Simulator:
             self.dailyAccountValue.append(self.broker.GetAccountValue())
 
         self.ShowResults()
+
+
 
 
 
