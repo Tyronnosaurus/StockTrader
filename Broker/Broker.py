@@ -27,7 +27,7 @@ class Broker:
                 del self.Orders[i]  #Delete order once executed
        
 
-
+    #Returns True if order can be executed according to its limits and the current market price
     def _canBeExecuted(self, order):
         if (order.limitType == limitTypes.MARKET): return(True)
         if (order.limitType == limitTypes.LIMITED):
@@ -35,6 +35,7 @@ class Broker:
             elif (order.buySell == buySell.SELL) and (self.dataReader.GetPrice(order.productId, self.currentTime) >= order.price): return(True)
 
 
+    #Executes an order
     def _executeOrder(self, order):
         if   (order.buySell == buySell.BUY):  self._buyInstantly(order)
         elif (order.buySell == buySell.SELL): self._sellInstantly(order)
@@ -42,13 +43,15 @@ class Broker:
 
     #Buy a group of shares at current market price
     def _buyInstantly(self, order):
+        #Get current market price and take money out of the funds to buy the shares
         marketPrice = self.dataReader.GetPrice(order.productId, self.currentTime)
         self.Funds -= marketPrice * order.size
+        #Add a shareGroup to the portfolio
         s = SharesGroup(order.productId, order.size, marketPrice, self.currentTime)
         self.Portfolio.append(s)
 
 
-    #Sell a group of shares from portfolio at the current market price
+    #Sell shares from portfolio at the current market price
     def _sellInstantly(self, order):
 
         #First, make sure there are enough shares to sell
