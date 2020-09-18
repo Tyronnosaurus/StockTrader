@@ -46,7 +46,7 @@ def DownloadPriceHistory(ticker):
 
 #Connect to database (create if file doesn't exist)
 workDir = os.getcwd()
-conn = sqlite3.connect(workDir + '/FinancialData/StockDB.db')
+conn = sqlite3.connect(workDir + '/DbReader/StockDB.db')
 cur = conn.cursor()
 
 for index in Indexes:

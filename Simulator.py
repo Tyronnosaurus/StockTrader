@@ -3,7 +3,7 @@ from Broker.Order import buySell, limitTypes
 from datetime import date
 from Helpers import daterange, datetime
 import matplotlib.pyplot as plt
-from FinancialData.DataReader import DataReader
+from DbReader.DbReader import DbReader
 
 
 class Simulator:
@@ -12,7 +12,7 @@ class Simulator:
         self.start_date = Start_date
         self.end_date   = End_date
         self.broker = Broker()       #Stores our funds and portfolio, executes buy&sell orders   
-        self.dataReader = DataReader() #Connects to SQL and fetches information
+        self.dbReader = DbReader() #Connects to SQL and fetches information
 
 
     def RunSimulation(self):
@@ -33,7 +33,7 @@ class Simulator:
                 index = 'GDAXI'
 
                 #Get list of stocks in that index
-                usableStocks = self.dataReader.GetStocksInIndex(index)
+                usableStocks = self.dbReader.GetStocksInIndex(index)
 
                 #Find a stock in local min, 1Y-5Y low-ish
                 

@@ -4,11 +4,11 @@ import os
 
 
 #Fetches financial data stored in an SQL database (once it's downloaded, it's faster and safer to use a local database for simulations) 
-class DataReader:
+class DbReader:
     
     def __init__(self):
         workDir = os.getcwd()
-        self.conn = sqlite3.connect(workDir + '/FinancialData/StockDB.db')
+        self.conn = sqlite3.connect(workDir + '/DbReader/StockDB.db')
         self.cur = self.conn.cursor()
 
 

@@ -1,4 +1,4 @@
-from FinancialData.DataReader import DataReader
+from DbReader.DbReader import DbReader
 from datetime import datetime
 from .Order import Order, buySell, limitTypes, timeTypes
 from .SharesGroup import SharesGroup
@@ -11,7 +11,7 @@ class Broker:
         self.Funds = 0.0
         self.Portfolio = []
         self.Orders = []
-        self.dataReader = DataReader()
+        self.dbReader = DbReader()
 
 
 
@@ -31,8 +31,8 @@ class Broker:
     def _canBeExecuted(self, order):
         if (order.limitType == limitTypes.MARKET): return(True)
         if (order.limitType == limitTypes.LIMITED):
-            if   (order.buySell == buySell.BUY)  and (self.dataReader.GetPrice(order.productId, self.currentTime) <= order.price): return(True)
-            elif (order.buySell == buySell.SELL) and (self.dataReader.GetPrice(order.productId, self.currentTime) >= order.price): return(True)
+            if   (order.buySell == buySell.BUY)  and (self.dbReader.GetPrice(order.productId, self.currentTime) <= order.price): return(True)
+            elif (order.buySell == buySell.SELL) and (self.dbReader.GetPrice(order.productId, self.currentTime) >= order.price): return(True)
 
 
     #Executes an order
@@ -44,7 +44,7 @@ class Broker:
     #Buy a group of shares at current market price
     def _buyInstantly(self, order):
         #Get current market price and take money out of the funds to buy the shares
-        marketPrice = self.dataReader.GetPrice(order.productId, self.currentTime)
+        marketPrice = self.dbReader.GetPrice(order.productId, self.currentTime)
         self.Funds -= marketPrice * order.size
         #Add a shareGroup to the portfolio
         s = SharesGroup(order.productId, order.size, marketPrice, self.currentTime)
@@ -62,11 +62,11 @@ class Broker:
             for i,sharesGroup in enumerate(self.Portfolio):
                 if (sharesGroup.ticker == order.productId):
                     if (remainingQtyToSell >= sharesGroup.quantity):
-                        self.Funds += self.dataReader.GetPrice(self.Portfolio[i].ticker, self.currentTime) * self.Portfolio[i].quantity
+                        self.Funds += self.dbReader.GetPrice(self.Portfolio[i].ticker, self.currentTime) * self.Portfolio[i].quantity
                         del self.Portfolio[i]     #Delete shares group from portfolio
                         remainingQtyToSell -= sharesGroup.quantity  #
                     elif (remainingQtyToSell < sharesGroup.quantity):
-                        self.Funds += self.dataReader.GetPrice(self.Portfolio[i].ticker, self.currentTime) * remainingQtyToSell
+                        self.Funds += self.dbReader.GetPrice(self.Portfolio[i].ticker, self.currentTime) * remainingQtyToSell
                         self.Portfolio[i].ReduceQtyBy(remainingQtyToSell)
                         remainingQtyToSell = 0
                         break   #Exit the 'for' loop
@@ -89,7 +89,7 @@ class Broker:
     def calculateSharesValue(self):
         sharesValue = 0
         for group in self.Portfolio:
-             sharesValue += group.quantity * self.dataReader.GetPrice(group.ticker, self.currentTime)
+             sharesValue += group.quantity * self.dbReader.GetPrice(group.ticker, self.currentTime)
         return(sharesValue)
 
 
