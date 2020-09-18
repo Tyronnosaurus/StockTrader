@@ -5,7 +5,7 @@ import yfinance as yf
 from SqlHelpers import ListToSqlColumn
 
 
-#Indexes to include. Yahoo Finances uses non-standard names for the indexes, and also appends an ^ preffix
+#Indexes to include. Yahoo Finances uses non-standard names for the indexes
 Indexes = ['GDAXI',    #DAX
            'MDAXI',    #MDAX
            'IBEX']     #IBEX 35
@@ -34,9 +34,11 @@ def DownloadPriceHistory(ticker):
 
         df = data.history(period="max")['Close']   #Download data. Only store the 'Close price' column
 
-        if (len(df)==0): return()     #Ignore empty dataframe (possibly delisted company) 
+        if (len(df)==0): return()     #Ignore empty dataframe (possibly delisted company)
+
+        ticker = ticker.replace('^','') #Yahoo Finance uses a '^' preffix in index names, but we don't want that for the name of tables or it will mess up SQL queries
         
-        df.to_sql(ticker.replace('^',''), conn, if_exists='replace', index=True)
+        df.to_sql(ticker, conn, if_exists='replace', index=True)
 
 
 

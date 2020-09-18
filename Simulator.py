@@ -36,6 +36,7 @@ class Simulator:
                 usableStocks = self.dataReader.GetStocksInIndex(index)
 
                 #Find a stock in local min, 1Y-5Y low-ish
+                
                 #Buy $5000 of it instantaneously
                 #Place Sell Order for 102% of buy price
 
