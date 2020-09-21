@@ -5,6 +5,9 @@ from Helpers import daterange, datetime
 import matplotlib.pyplot as plt
 from DbReader.DbReader import DbReader
 
+Indexes = ['GDAXI',    #DAX
+           'MDAXI',    #MDAX
+           'IBEX']     #IBEX 35
 
 class Simulator:
 
@@ -22,31 +25,44 @@ class Simulator:
         for t in daterange(self.start_date, self.end_date):
             self.broker.SetDateTime(t)    #Change broker's internal time so that it looks at past price data
 
-
+            SingleInvestment = 2000  #Spend up to this for each buy 
 
             ## STRATEGY ##
-            #If funds > $5000
-            if (self.broker.Funds >= 5000):
-                pass
-                #Get list of indexes
-                #Find an index with a local min. Return if not found
-                index = 'GDAXI'
+            #If funds > $SingleInvestment
+            if (self.broker.Funds >= SingleInvestment):
 
-                #Get list of stocks in that index
-                usableStocks = self.dbReader.GetStocksInIndex(index)
+                for index in Indexes:
+                    #Find an index that is lowish (don't want to buy stocks while market is high)
+                    if(self.dbReader.IsLow(index, t, 5, 0.3)):
 
-                #Find a stock in local min, 1Y-5Y low-ish
-                
-                #Buy $5000 of it instantaneously
-                #Place Sell Order for 102% of buy price
+                        #Get list of stocks in that index
+                        usableStocks = self.dbReader.GetStocksInIndex(index)
+
+                        for ticker in usableStocks:
+                            #Find a stock in local min, 1Y-5Y low-ish
+                            if(not self.broker.AlreadyHaveStocksFrom(ticker) and    #Diversify! Don't buy stocks we already have
+                                self.dbReader.IsLow(ticker, t, 5, 0.05) and          #Clear week low
+                                self.dbReader.IsLow(ticker, t, 500, 0.25)):          #2 year low-ish
+
+                                if (self.broker.Funds >= SingleInvestment):
+                                    #Buy instantaneously
+                                    currPrice = self.dbReader.GetPrice(ticker, t)
+                                    qty = int(SingleInvestment/currPrice) #Can't buy partial stocks, so use int()
+                                    self.broker.PlaceOrder(buySell.BUY, limitTypes.MARKET, ticker, qty , 0)
+
+                                    #Place Sell Order for 102% of buy price
+                                    sellPrice = currPrice*1.02
+                                    self.broker.PlaceOrder(buySell.SELL, limitTypes.LIMITED, ticker, qty, sellPrice)
+                                    
+                                    self.broker.ExecuteOrders() #Must execute after every buy order, or else funds aren't substracted immediately
+
 
             #Command trader to execute any buy&sell orders
-
-            if (t.day == 10): self.broker.PlaceOrder(buySell.BUY, limitTypes.MARKET, 'ADS.DE', 5, 0)
-
             self.broker.ExecuteOrders()
             self.dailyAccountValue.append(self.broker.GetAccountValue())
 
+            self.broker.ShowAccountValue()
+        
         self.ShowResults()
 
 
