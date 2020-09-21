@@ -50,7 +50,7 @@ class Broker:
         s = SharesGroup(order.productId, order.size, marketPrice, self.currentTime)
         self.Portfolio.append(s)
 
-        logTxt = "   BUY {:8} {} x ${:.2f} = -${:.2f}"
+        logTxt = "    BUY {:8} {} x ${:.2f} = -${:.2f}"
         print(logTxt.format(order.productId, order.size, marketPrice, order.size*marketPrice)) 
 
 
@@ -75,7 +75,7 @@ class Broker:
                         remainingQtyToSell = 0
                         break   #Exit the 'for' loop
         
-        logTxt = "   SELL {:8} {} x ${:.2f} = +${:.2f}"
+        logTxt = "    SELL {:8} {} x ${:.2f} = +${:.2f}"
         print(logTxt.format(order.productId, order.size, marketPrice, order.size*marketPrice)) 
 
 
@@ -106,9 +106,8 @@ class Broker:
 
     def ShowAccountValue(self):
         sharesValue = self.calculateSharesValue()
-        print('Funds: $' + str(self.Funds))
-        print('Stocks:$' + str(sharesValue))
-        print('Total: $' + str(self.Funds + sharesValue))
+        totalValue = self.Funds + sharesValue
+        print('RESULTS ({}): Funds ${:.2f}  |  Stocks ${:.2f}  |  Total ${:.2f}'.format(self.currentTime, self.Funds, sharesValue, totalValue))
 
 
     def LoadFunds(self, newFunds):
