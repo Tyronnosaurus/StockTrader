@@ -38,10 +38,29 @@ class DbReader:
         prices = [i[1] for i in prices] #We've got a list of lists, so we convert it to a simple list
         return(prices)
 
-'''
-dbReader = DbReader()
-endTime = datetime(2020, 1, 2, 0, 0, 0)
-prices = dbReader.GetPricesFromPeriod('ADS.DE', endTime, 10)
-print(prices)
-'''
+
+    #
+    def _getLastDayRelativePosition(self, ticker, lastDay, totalDays):
+        pricesList = self.GetPricesFromPeriod(ticker, lastDay, totalDays)   #Get prices from last N days
+        indexLastDay = totalDays - 1
+        posLastDay = self._getIndexInSortedArray(pricesList, indexLastDay)  #Get position of last day if the list was sorted
+        return(posLastDay / totalDays)  #Return as a percentage
+    
+
+    #Returns position of a list item if the list was sorted
+    def _getIndexInSortedArray(self, arr, idx):
+        #To optimize, rather than sorting we just count how many smaller items there are
+        count = 0
+        for i,_ in enumerate(arr):
+            if (arr[i] < arr[idx]):  #If element is smaller then increase the smaller count
+                count += 1
+    
+            if (arr[i] == arr[idx] and i < idx):  #If element is equal then also increase count (only if it occurs before)
+                count += 1
+        return(count)
+
+
+    def IsLow(self, ticker, lastDay, totalDays, maxPercentage):
+        return(self._getLastDayRelativePosition(ticker, lastDay, totalDays) <= maxPercentage)
+
 
