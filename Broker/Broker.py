@@ -112,3 +112,10 @@ class Broker:
         self.currentTime = dt
 
 
+    #Returns True if we already have stocks from a certain company in our portfolio
+    def AlreadyHaveStocksFrom(self, ticker):
+        for item in self.Portfolio:
+            if(item.ticker == ticker): return(True)
+        return(False)
+
+
