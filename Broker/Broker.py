@@ -50,6 +50,9 @@ class Broker:
         s = SharesGroup(order.productId, order.size, marketPrice, self.currentTime)
         self.Portfolio.append(s)
 
+        logTxt = "   BUY {:8} {} x ${:.2f} = -${:.2f}"
+        print(logTxt.format(order.productId, order.size, marketPrice, order.size*marketPrice)) 
+
 
     #Sell shares from portfolio at the current market price
     def _sellInstantly(self, order):
@@ -59,17 +62,21 @@ class Broker:
             print("Order: %s x %s failed: not enough shares in portfolio", (order.productId, order.size))
         else:
             remainingQtyToSell = order.size
+            marketPrice = self.dbReader.GetPrice(order.productId, self.currentTime)
             for i,sharesGroup in enumerate(self.Portfolio):
                 if (sharesGroup.ticker == order.productId):
                     if (remainingQtyToSell >= sharesGroup.quantity):
-                        self.Funds += self.dbReader.GetPrice(self.Portfolio[i].ticker, self.currentTime) * self.Portfolio[i].quantity
+                        self.Funds += marketPrice * self.Portfolio[i].quantity
                         del self.Portfolio[i]     #Delete shares group from portfolio
-                        remainingQtyToSell -= sharesGroup.quantity  #
+                        remainingQtyToSell -= sharesGroup.quantity
                     elif (remainingQtyToSell < sharesGroup.quantity):
-                        self.Funds += self.dbReader.GetPrice(self.Portfolio[i].ticker, self.currentTime) * remainingQtyToSell
+                        self.Funds += marketPrice * remainingQtyToSell
                         self.Portfolio[i].ReduceQtyBy(remainingQtyToSell)
                         remainingQtyToSell = 0
                         break   #Exit the 'for' loop
+        
+        logTxt = "   SELL {:8} {} x ${:.2f} = +${:.2f}"
+        print(logTxt.format(order.productId, order.size, marketPrice, order.size*marketPrice)) 
 
 
 
