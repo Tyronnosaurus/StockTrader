@@ -59,7 +59,8 @@ class Broker:
 
         #First, make sure there are enough shares to sell
         if (not self._haveEnoughSharesInPortfolio(order)):
-            print("Order: %s x %s failed: not enough shares in portfolio", (order.productId, order.size))
+            print("Order: %s x %s failed: not enough shares in portfolio" % (order.productId, order.size))
+            for item in self.Portfolio: print(item.ticker, item.quantity)
         else:
             remainingQtyToSell = order.size
             marketPrice = self.dbReader.GetPrice(order.productId, self.currentTime)
