@@ -1,6 +1,6 @@
 from Broker.Broker import Broker
 from Broker.Order import buySell, limitTypes
-from datetime import date
+from datetime import date, timedelta
 from Helpers import daterange, datetime
 import matplotlib.pyplot as plt
 from DbReader.DbReader import DbReader
@@ -57,6 +57,14 @@ class Simulator:
                                     self.broker.ExecuteOrders() #Must execute after every buy order, or else funds aren't substracted immediately
 
 
+            #Sell at a loss stocks that are keeping cash hostage
+            for item in self.broker.Portfolio:
+                print(t - item.buyTime)
+                if(t - item.buyTime > timedelta(days=10)):
+                    print("Gonna sell old stock {}".format(item.ticker))
+                    self.broker.PlaceOrder(buySell.SELL, limitTypes.MARKET, item.ticker, item.quantity, 0)
+                    self.broker.ExecuteOrders()
+
             #Command trader to execute any buy&sell orders
             self.broker.ExecuteOrders()
             self.dailyAccountValue.append(self.broker.GetAccountValue())
@@ -78,7 +86,7 @@ class Simulator:
 
 
 
-start_date = datetime(2019, 1, 1, 0, 0, 0)
+start_date = datetime(2018, 1, 1, 0, 0, 0)
 end_date   = datetime(2020, 1, 1, 0, 0, 0)
 simulator = Simulator(start_date, end_date)
 simulator.RunSimulation()
